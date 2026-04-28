@@ -1,0 +1,33 @@
+---
+import Base from "../../layouts/Base.astro";
+
+// Placeholder Genesis 1 with KJV (public domain). The real chapter
+// page will be emitted by `bst emit-static --book genesis --chapter 1`
+// from BibleStudyTool's local DuckDB once translations are loaded.
+const verses = [
+    { v: 1, text: "In the beginning God created the heaven and the earth." },
+    { v: 2, text: "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters." },
+    { v: 3, text: "And God said, Let there be light: and there was light." },
+    { v: 4, text: "And God saw the light, that it was good: and God divided the light from the darkness." },
+    { v: 5, text: "And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day." },
+];
+---
+<Base title="Genesis 1 · BibleStudy">
+  <h1>Genesis 1</h1>
+  <p class="provenance">
+    Placeholder · KJV (1611, public domain) · custom translation pending generation
+  </p>
+  <div class="chapter-body">
+    {verses.map((row) => (
+      <span class="verse" id={`v${row.v}`}>
+        <a href={`#v${row.v}`} class="verse-num">{row.v}</a>{row.text}{" "}
+      </span>
+    ))}
+  </div>
+  <h2>Chapter resources</h2>
+  <p>
+    Detail panels (interlinear, cross-refs, exegesis, chronology, maps, slides,
+    song) will land as the BibleStudyTool emitter wires them. This page proves
+    the deploy pipeline; content arrives next.
+  </p>
+</Base>

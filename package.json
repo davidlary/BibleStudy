@@ -1,0 +1,20 @@
+{
+  "name": "bible-study-website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Static study Bible — chapter-page primary reading + verse-level Detail panels (interlinear / cross-refs / exegesis / chronology / maps / slides / song). Built from BibleStudyTool emitter; hosted on GitHub Pages + Cloudflare Pages.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "@astrojs/mdx": "^4.0.0"
+  },
+  "devDependencies": {
+    "pagefind": "^1.1.1"
+  }
+}

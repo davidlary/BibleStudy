@@ -1,0 +1,31 @@
+---
+import "../styles/global.css";
+const { title = "BibleStudy" } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b6f3f'%3E%3Cpath d='M19 2H8C6.9 2 6 2.9 6 4v16c0 1.1.9 2 2 2h11V2zm-2 16H8V4h9v14z'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="topbar">
+    <a href={`${import.meta.env.BASE_URL}/`} class="brand">BibleStudy</a>
+    <nav>
+      <a href={`${import.meta.env.BASE_URL}/`}>Home</a>
+      <a href={`${import.meta.env.BASE_URL}/genesis/1/`}>Genesis 1</a>
+    </nav>
+  </header>
+  <main>
+    <slot />
+  </main>
+  <footer class="footer">
+    BibleStudy · custom LLM-generated translation · Hebrew/Greek interlinear from open public-domain sources ·
+    cross-references CC-BY OpenBible.info · chronology Ussher 1658 (PD).
+    <br />
+    Hosted on GitHub Pages + Cloudflare Pages from <a href="https://github.com/davidlary/BibleStudy">davidlary/BibleStudy</a>.
+  </footer>
+</body>
+</html>

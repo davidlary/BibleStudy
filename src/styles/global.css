@@ -1,0 +1,202 @@
+/* BibleStudy — global typography + design tokens.
+ *
+ * Reading-first restraint: single 660px column, EB Garamond 19/1.75,
+ * warm-paper light + deep-slate dark. NO panel proliferation; NO
+ * narrow translation columns; chrome is small and quiet.
+ */
+
+@font-face {
+    font-family: "EB Garamond";
+    src: url("/BibleStudy/fonts/EBGaramond-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "EB Garamond";
+    src: url("/BibleStudy/fonts/EBGaramond-Italic.woff2") format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: "EB Garamond";
+    src: url("/BibleStudy/fonts/EBGaramond-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    /* Light theme — warm paper */
+    --bg: #faf7f2;
+    --bg-elev: #f3ede2;
+    --ink: #1a1a1a;
+    --ink-muted: #555;
+    --rule: #d8d2c5;
+    --accent: #8b6f3f;
+    --accent-muted: #b59963;
+    --link: #6b3e1a;
+
+    --serif: "EB Garamond", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --col: 660px;
+    --topbar-h: 56px;
+
+    --t-fast: 120ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #15181d;
+        --bg-elev: #1d2027;
+        --ink: #e8e4dc;
+        --ink-muted: #b0aaa1;
+        --rule: #2c3038;
+        --accent: #d4a574;
+        --accent-muted: #a37f4f;
+        --link: #d4b288;
+    }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+body { min-height: 100vh; display: flex; flex-direction: column; }
+
+main {
+    width: 100%;
+    max-width: var(--col);
+    margin: 0 auto;
+    padding: 2rem 1.25rem 6rem;
+    flex: 1 1 auto;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--serif);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+}
+h1 {
+    font-size: 1.75rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+h2 {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    margin-top: 2.4rem;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.3rem;
+}
+
+p { margin: 0 0 1rem; }
+
+a { color: var(--link); text-decoration: none; transition: color var(--t-fast); }
+a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+code, pre {
+    font-family: var(--mono);
+    font-size: 0.9em;
+}
+code { background: var(--bg-elev); padding: 0.05em 0.35em; border-radius: 3px; }
+pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; overflow-x: auto; }
+
+/* ----- Topbar ----------------------------------------------- */
+.topbar {
+    height: var(--topbar-h);
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(6px);
+}
+.topbar .brand {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--ink);
+}
+.topbar nav {
+    margin-left: auto;
+    display: flex;
+    gap: 1.5rem;
+    color: var(--ink-muted);
+}
+.topbar nav a:hover { color: var(--ink); }
+
+/* ----- Footer ----------------------------------------------- */
+.footer {
+    border-top: 1px solid var(--rule);
+    color: var(--ink-muted);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+/* ----- Verse text ------------------------------------------- */
+.chapter-body {
+    text-align: justify;
+    hyphens: auto;
+}
+.verse {
+    display: inline;
+    margin-right: 0.25em;
+}
+.verse-num {
+    font-family: var(--sans);
+    font-feature-settings: "tnum";
+    font-size: 0.65em;
+    vertical-align: super;
+    color: var(--ink-muted);
+    margin-right: 0.15em;
+    cursor: pointer;
+    transition: color var(--t-fast);
+}
+.verse-num:hover { color: var(--accent); }
+.verse[data-expanded="true"] {
+    display: block;
+    margin: 1rem 0;
+    padding: 0.8rem 1rem;
+    background: var(--bg-elev);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+}
+
+/* ----- Translation provenance ------------------------------ */
+.provenance {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}

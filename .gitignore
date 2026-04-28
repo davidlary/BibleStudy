@@ -1,0 +1,21 @@
+# build artefacts
+dist/
+.astro/
+
+# deps
+node_modules/
+
+# Pagefind output (regenerated on each build)
+dist/pagefind/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+
+# env
+.env
+.env.local

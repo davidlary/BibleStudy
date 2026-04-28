@@ -1,0 +1,105 @@
+# Dual-deploy: GitHub Pages + Cloudflare Pages from one workflow.
+# build job produces dist/; both deploy jobs consume the SAME artifact
+# so the two mirrors are byte-identical.
+#
+# Required secrets (set in repo Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   # Pages:Edit scope on a token bound to the project
+#   CLOUDFLARE_ACCOUNT_ID  # account UUID
+#
+# See ../BibleStudyTool/docs/STATIC_SITE_ARCHITECTURE.md §7 for the topology.
+
+name: Build + dual deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build site (Astro + Pagefind)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Inspect dist/
+        run: |
+          echo "Built artifact summary:"
+          du -sh dist
+          find dist -type f | wc -l
+          find dist -type f -name "*.html" | head -10
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Upload Cloudflare artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-dist
+          path: dist
+          retention-days: 1
+
+  deploy-gh-pages:
+    name: Deploy → GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  deploy-cloudflare:
+    name: Deploy → Cloudflare Pages
+    needs: build
+    runs-on: ubuntu-latest
+    # Cloudflare deploy is best-effort: if the secrets aren't set, we
+    # surface a yellow notice but don't fail the workflow.
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: cloudflare-dist
+          path: dist
+
+      - name: Check Cloudflare credentials
+        id: creds
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] || [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "configured=false" >> $GITHUB_OUTPUT
+            echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID not configured — skipping Cloudflare deploy. GitHub Pages deploy continues."
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy
+        if: steps.creds.outputs.configured == 'true'
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: biblestudy
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
