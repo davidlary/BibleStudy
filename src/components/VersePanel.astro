@@ -42,23 +42,37 @@ const { verse, primaryCodes } = Astro.props;
     )}
   </section>
 
-  <!-- Interlinear panel -->
+  <!-- Interlinear panel — Phase D3 v2: tabular layout -->
   <section class="vp-section" data-pane="interlinear" role="tabpanel" hidden>
     {verse.interlinear.length > 0 ? (
-      <div class="vp-interlinear" data-lang={verse.interlinear[0]?.lang}>
-        {verse.interlinear.map((w) => (
-          <span class="vp-word" tabindex="0">
-            <span class="vp-surface">{w.surface}</span>
-            <span class="vp-translit">{w.transliteration}</span>
-            <span class="vp-tooltip">
-              <strong>{w.lemma}</strong>{" "}
-              <span class="vp-strongs">[{w.strongs}]</span><br />
-              <em>{w.morph}</em><br />
-              "{w.gloss}"
-            </span>
-          </span>
-        ))}
-      </div>
+      <table class="vp-interlinear-table" data-lang={verse.interlinear[0]?.lang}>
+        <thead>
+          <tr>
+            <th class="vp-col-num">#</th>
+            <th class="vp-col-orig">Hebrew/Greek</th>
+            <th class="vp-col-translit">Transliteration</th>
+            <th class="vp-col-strongs">Strong's</th>
+            <th class="vp-col-lemma">Lemma</th>
+            <th class="vp-col-morph">Parsing</th>
+            <th class="vp-col-gloss">Gloss</th>
+          </tr>
+        </thead>
+        <tbody>
+          {verse.interlinear.map((w) => (
+            <tr>
+              <td class="vp-col-num">{w.position}</td>
+              <td class="vp-col-orig"><span class="vp-surface">{w.surface}</span></td>
+              <td class="vp-col-translit">{w.transliteration || ""}</td>
+              <td class="vp-col-strongs">
+                {w.strongs ? <code class="vp-strongs">{w.strongs}</code> : ""}
+              </td>
+              <td class="vp-col-lemma">{w.lemma}</td>
+              <td class="vp-col-morph"><code>{w.morph}</code></td>
+              <td class="vp-col-gloss"><em>{w.gloss || "—"}</em></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     ) : (
       <p class="vp-empty">Interlinear data not yet ingested for this verse.</p>
     )}
