@@ -79,6 +79,12 @@ const allTranslations = [
     <p class="meta">Power-user override: append <code>?audit=1</code> to any chapter URL to expand audit metadata for that visit only.</p>
   </form>
 
+  <h2>Pericope headings</h2>
+  <p>Pericopes are literary units (paragraphs) within a chapter. Headings are hand-curated per <a href="https://github.com/davidlary/BibleStudyTool/blob/main/docs/PERICOPE_HEADING_STYLE.md">our 6-rule style guide</a> — divine agency foregrounded, no speculation, ≤8 words, echoing the inspired text.</p>
+  <form id="pericope-form" class="settings-form">
+    <label><input type="checkbox" name="pericope_show" checked> Show pericope headings on chapter pages</label>
+  </form>
+
   <h2>LLM provider</h2>
   <p>The Settings record what the BibleStudyTool authoring side should use when generating new exegeses + translations. The static site itself does not call any LLM.</p>
   <form id="llm-form" class="settings-form">
@@ -101,6 +107,7 @@ const allTranslations = [
         llm: "gemini",
         phase: "phase_a_text",
         audit_default_open: false,
+        pericope_show: true,
       };
       function load() {
         try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch { return DEFAULTS; }
@@ -116,6 +123,7 @@ const allTranslations = [
         document.querySelectorAll('input[name="llm"]').forEach(i => { i.checked = (i.value === s.llm); });
         document.querySelectorAll('input[name="phase"]').forEach(i => { i.checked = (i.value === s.phase); });
         document.querySelectorAll('input[name="audit_default_open"]').forEach(i => { i.checked = !!s.audit_default_open; });
+        document.querySelectorAll('input[name="pericope_show"]').forEach(i => { i.checked = s.pericope_show !== false; });
         updateMeta();
       }
 
@@ -142,7 +150,8 @@ const allTranslations = [
         const llm = (document.querySelector('input[name="llm"]:checked') || {}).value || 'gemini';
         const phase = (document.querySelector('input[name="phase"]:checked') || {}).value || 'phase_a_text';
         const audit_default_open = !!(document.querySelector('input[name="audit_default_open"]') || {}).checked;
-        return { codes, theme, mode, panels, llm, phase, audit_default_open };
+        const pericope_show = !!(document.querySelector('input[name="pericope_show"]') || {}).checked;
+        return { codes, theme, mode, panels, llm, phase, audit_default_open, pericope_show };
       }
 
       document.querySelectorAll('input').forEach(i => i.addEventListener('change', () => {

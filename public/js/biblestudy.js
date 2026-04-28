@@ -69,6 +69,19 @@
     })();
 
     // -----------------------------------------------------------------
+    // Phase H3: pericope-heading visibility toggle
+    // -----------------------------------------------------------------
+    (function applyPericopeVisibility() {
+        const s = loadSettings();
+        // Default: show. Hide only when explicitly unchecked.
+        if (s.pericope_show === false) {
+            document.querySelectorAll(".pericope-heading").forEach((h) => {
+                h.style.display = "none";
+            });
+        }
+    })();
+
+    // -----------------------------------------------------------------
     // D2: verse-number click → toggle panel
     // -----------------------------------------------------------------
     document.addEventListener("click", (e) => {

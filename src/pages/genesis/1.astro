@@ -6295,8 +6295,75 @@ const verses = [
     "exegesis_sections": null
   }
 ];
+const pericopes = [
+  {
+    "id": "Gen.1.peri.001",
+    "verse_start": 1,
+    "verse_end": 2,
+    "heading": "Heaven and Earth Created",
+    "source": "biblestudy-curated-v1"
+  },
+  {
+    "id": "Gen.1.peri.002",
+    "verse_start": 3,
+    "verse_end": 13,
+    "heading": "Days One Through Three of Creation",
+    "source": "biblestudy-curated-v1"
+  },
+  {
+    "id": "Gen.1.peri.003",
+    "verse_start": 14,
+    "verse_end": 25,
+    "heading": "Days Four and Five of Creation",
+    "source": "biblestudy-curated-v1"
+  },
+  {
+    "id": "Gen.1.peri.004",
+    "verse_start": 26,
+    "verse_end": 31,
+    "heading": "Man Created in the Image of God",
+    "source": "biblestudy-curated-v1"
+  }
+];
 const primaryCodes = ["asv", "bsb", "kjv"];
 const primary = primaryCodes[0];
+
+// Phase H3: group verses by pericope. Returns
+// [{ heading, verses: [verseObjects...] }, ...] where heading is
+// "" for any verse range that has no pericope row (we still render
+// the verses, just without a heading).
+function groupByPericope(allVerses, allPericopes) {
+  if (!allPericopes || allPericopes.length === 0) {
+    return [{ heading: "", verses: allVerses }];
+  }
+  const groups = [];
+  let cursor = 0;
+  for (const peri of allPericopes) {
+    while (cursor < allVerses.length && allVerses[cursor].verse_num < peri.verse_start) {
+      if (groups.length === 0 || groups[groups.length - 1].heading !== "") {
+        groups.push({ heading: "", verses: [] });
+      }
+      groups[groups.length - 1].verses.push(allVerses[cursor]);
+      cursor++;
+    }
+    const peri_group = { heading: peri.heading, peri_id: peri.id, verses: [] };
+    while (cursor < allVerses.length && allVerses[cursor].verse_num <= peri.verse_end) {
+      peri_group.verses.push(allVerses[cursor]);
+      cursor++;
+    }
+    if (peri_group.verses.length > 0) groups.push(peri_group);
+  }
+  while (cursor < allVerses.length) {
+    if (groups.length === 0 || groups[groups.length - 1].heading !== "") {
+      groups.push({ heading: "", verses: [] });
+    }
+    groups[groups.length - 1].verses.push(allVerses[cursor]);
+    cursor++;
+  }
+  return groups;
+}
+
+const pericope_groups = groupByPericope(verses, pericopes);
 ---
 <Base title="Genesis 1 · BibleStudy">
   <h1>Genesis 1</h1>
@@ -6309,14 +6376,21 @@ const primary = primaryCodes[0];
     window.__bs_primaryCodes = codes;
   </script>
   <div class="chapter-body">
-    {verses.map((v) => (
-      <>
-        <span class="verse" id={`v${v.verse_num}`} data-verse-id={v.verse_id} data-translations={JSON.stringify(v.translations)}>
-          <a href={`#v${v.verse_num}`} class="verse-num" aria-expanded="false" aria-controls={`panel-${v.verse_id}`}>{v.verse_num}</a>
-          <span class="verse-text">{v.translations[primary] ?? <em>[translation pending]</em>}</span>{" "}
-        </span>
-        <VersePanel verse={v} primaryCodes={primaryCodes} />
-      </>
+    {pericope_groups.map((group) => (
+      <section class="pericope" data-peri-id={group.peri_id || ""}>
+        {group.heading && <h3 class="pericope-heading">{group.heading}</h3>}
+        <p class="pericope-body">
+          {group.verses.map((v) => (
+            <>
+              <span class="verse" id={`v${v.verse_num}`} data-verse-id={v.verse_id} data-translations={JSON.stringify(v.translations)}>
+                <a href={`#v${v.verse_num}`} class="verse-num" aria-expanded="false" aria-controls={`panel-${v.verse_id}`}>{v.verse_num}</a>
+                <span class="verse-text">{v.translations[primary] ?? <em>[translation pending]</em>}</span>{" "}
+              </span>
+              <VersePanel verse={v} primaryCodes={primaryCodes} />
+            </>
+          ))}
+        </p>
+      </section>
     ))}
   </div>
 </Base>

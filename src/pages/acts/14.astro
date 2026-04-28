@@ -1,0 +1,551 @@
+---
+import Base from "../../layouts/Base.astro";
+import VersePanel from "../../components/VersePanel.astro";
+
+{/* Emitted by bst static_site.emitter — DO NOT EDIT BY HAND. Re-run `bst emit-static` to refresh. */}
+const verses = [
+  {
+    "verse_id": "Acts.14.1",
+    "verse_num": 1,
+    "translations": {
+      "kjv": "And it came to pass in Iconium, that they went both together into the synagogue of the Jews, and so spake, that a great multitude both of the Jews and also of the Greeks believed.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.2",
+    "verse_num": 2,
+    "translations": {
+      "kjv": "But the unbelieving Jews stirred up the Gentiles, and made their minds evil affected against the brethren.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.3",
+    "verse_num": 3,
+    "translations": {
+      "kjv": "Long time therefore abode they speaking boldly in the Lord, which gave testimony unto the word of his grace, and granted signs and wonders to be done by their hands.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.4",
+    "verse_num": 4,
+    "translations": {
+      "kjv": "But the multitude of the city was divided: and part held with the Jews, and part with the apostles.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.5",
+    "verse_num": 5,
+    "translations": {
+      "kjv": "And when there was an assault made both of the Gentiles, and also of the Jews with their rulers, to use them despitefully, and to stone them,",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.6",
+    "verse_num": 6,
+    "translations": {
+      "kjv": "They were ware of it, and fled unto Lystra and Derbe, cities of Lycaonia, and unto the region that lieth round about:",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.7",
+    "verse_num": 7,
+    "translations": {
+      "kjv": "And there they preached the gospel.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.8",
+    "verse_num": 8,
+    "translations": {
+      "kjv": "And there sat a certain man at Lystra, impotent in his feet, being a cripple from his mother's womb, who never had walked:",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.9",
+    "verse_num": 9,
+    "translations": {
+      "kjv": "The same heard Paul speak: who stedfastly beholding him, and perceiving that he had faith to be healed,",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.10",
+    "verse_num": 10,
+    "translations": {
+      "kjv": "Said with a loud voice, Stand upright on thy feet. And he leaped and walked.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.11",
+    "verse_num": 11,
+    "translations": {
+      "kjv": "And when the people saw what Paul had done, they lifted up their voices, saying in the speech of Lycaonia, The gods are come down to us in the likeness of men.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.12",
+    "verse_num": 12,
+    "translations": {
+      "kjv": "And they called Barnabas, Jupiter; and Paul, Mercurius, because he was the chief speaker.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.13",
+    "verse_num": 13,
+    "translations": {
+      "kjv": "Then the priest of Jupiter, which was before their city, brought oxen and garlands unto the gates, and would have done sacrifice with the people.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.14",
+    "verse_num": 14,
+    "translations": {
+      "kjv": "Which when the apostles, Barnabas and Paul, heard of, they rent their clothes, and ran in among the people, crying out,",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.15",
+    "verse_num": 15,
+    "translations": {
+      "kjv": "And saying, Sirs, why do ye these things? We also are men of like passions with you, and preach unto you that ye should turn from these vanities unto the living God, which made heaven, and earth, and the sea, and all things that are therein:",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.16",
+    "verse_num": 16,
+    "translations": {
+      "kjv": "Who in times past suffered all nations to walk in their own ways.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.17",
+    "verse_num": 17,
+    "translations": {
+      "kjv": "Nevertheless he left not himself without witness, in that he did good, and gave us rain from heaven, and fruitful seasons, filling our hearts with food and gladness.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.18",
+    "verse_num": 18,
+    "translations": {
+      "kjv": "And with these sayings scarce restrained they the people, that they had not done sacrifice unto them.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.19",
+    "verse_num": 19,
+    "translations": {
+      "kjv": "And there came thither certain Jews from Antioch and Iconium, who persuaded the people, and, having stoned Paul, drew him out of the city, supposing he had been dead.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.20",
+    "verse_num": 20,
+    "translations": {
+      "kjv": "Howbeit, as the disciples stood round about him, he rose up, and came into the city: and the next day he departed with Barnabas to Derbe.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.21",
+    "verse_num": 21,
+    "translations": {
+      "kjv": "And when they had preached the gospel to that city, and had taught many, they returned again to Lystra, and to Iconium, and Antioch,",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.22",
+    "verse_num": 22,
+    "translations": {
+      "kjv": "Confirming the souls of the disciples, and exhorting them to continue in the faith, and that we must through much tribulation enter into the kingdom of God.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.23",
+    "verse_num": 23,
+    "translations": {
+      "kjv": "And when they had ordained them elders in every church, and had prayed with fasting, they commended them to the Lord, on whom they believed.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.24",
+    "verse_num": 24,
+    "translations": {
+      "kjv": "And after they had passed throughout Pisidia, they came to Pamphylia.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.25",
+    "verse_num": 25,
+    "translations": {
+      "kjv": "And when they had preached the word in Perga, they went down into Attalia:",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.26",
+    "verse_num": 26,
+    "translations": {
+      "kjv": "And thence sailed to Antioch, from whence they had been recommended to the grace of God for the work which they fulfilled.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.27",
+    "verse_num": 27,
+    "translations": {
+      "kjv": "And when they were come, and had gathered the church together, they rehearsed all that God had done with them, and how he had opened the door of faith unto the Gentiles.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  },
+  {
+    "verse_id": "Acts.14.28",
+    "verse_num": 28,
+    "translations": {
+      "kjv": "And there they abode long time with the disciples.",
+      "asv": null,
+      "bsb": null
+    },
+    "interlinear": [],
+    "cross_refs": [],
+    "places": [],
+    "chronology": [],
+    "exegesis_md": "",
+    "exegesis_sections": null
+  }
+];
+const pericopes = [
+  {
+    "id": "Acts.14.peri.001",
+    "verse_start": 1,
+    "verse_end": 7,
+    "heading": "The Lord Confirms the Word at Iconium",
+    "source": "biblestudy-curated-v1"
+  },
+  {
+    "id": "Acts.14.peri.002",
+    "verse_start": 8,
+    "verse_end": 10,
+    "heading": "A Lame Man Healed at Lystra",
+    "source": "biblestudy-curated-v1"
+  },
+  {
+    "id": "Acts.14.peri.003",
+    "verse_start": 11,
+    "verse_end": 18,
+    "heading": "Paul and Barnabas Refuse Worship",
+    "source": "biblestudy-curated-v1"
+  },
+  {
+    "id": "Acts.14.peri.004",
+    "verse_start": 19,
+    "verse_end": 20,
+    "heading": "Paul Stoned and Raised Up",
+    "source": "biblestudy-curated-v1"
+  },
+  {
+    "id": "Acts.14.peri.005",
+    "verse_start": 21,
+    "verse_end": 23,
+    "heading": "Strengthening Disciples and Appointing Elders",
+    "source": "biblestudy-curated-v1"
+  },
+  {
+    "id": "Acts.14.peri.006",
+    "verse_start": 24,
+    "verse_end": 28,
+    "heading": "Reporting What God Had Done",
+    "source": "biblestudy-curated-v1"
+  }
+];
+const primaryCodes = ["asv", "bsb", "kjv"];
+const primary = primaryCodes[0];
+
+// Phase H3: group verses by pericope. Returns
+// [{ heading, verses: [verseObjects...] }, ...] where heading is
+// "" for any verse range that has no pericope row (we still render
+// the verses, just without a heading).
+function groupByPericope(allVerses, allPericopes) {
+  if (!allPericopes || allPericopes.length === 0) {
+    return [{ heading: "", verses: allVerses }];
+  }
+  const groups = [];
+  let cursor = 0;
+  for (const peri of allPericopes) {
+    while (cursor < allVerses.length && allVerses[cursor].verse_num < peri.verse_start) {
+      if (groups.length === 0 || groups[groups.length - 1].heading !== "") {
+        groups.push({ heading: "", verses: [] });
+      }
+      groups[groups.length - 1].verses.push(allVerses[cursor]);
+      cursor++;
+    }
+    const peri_group = { heading: peri.heading, peri_id: peri.id, verses: [] };
+    while (cursor < allVerses.length && allVerses[cursor].verse_num <= peri.verse_end) {
+      peri_group.verses.push(allVerses[cursor]);
+      cursor++;
+    }
+    if (peri_group.verses.length > 0) groups.push(peri_group);
+  }
+  while (cursor < allVerses.length) {
+    if (groups.length === 0 || groups[groups.length - 1].heading !== "") {
+      groups.push({ heading: "", verses: [] });
+    }
+    groups[groups.length - 1].verses.push(allVerses[cursor]);
+    cursor++;
+  }
+  return groups;
+}
+
+const pericope_groups = groupByPericope(verses, pericopes);
+---
+<Base title="Acts 14 · BibleStudy">
+  <h1>Acts 14</h1>
+  <p class="provenance">
+    Translations:&nbsp;<span class="provenance-active">{primary.toUpperCase()}</span> · alternates:&nbsp;{primaryCodes.slice(1).join(' · ')} ·
+    custom LLM translation arrives once generated by BibleStudyTool. ·
+    press <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> to swap; <kbd>c</kbd> to compare.
+  </p>
+  <script is:inline define:vars={{ codes: primaryCodes }}>
+    window.__bs_primaryCodes = codes;
+  </script>
+  <div class="chapter-body">
+    {pericope_groups.map((group) => (
+      <section class="pericope" data-peri-id={group.peri_id || ""}>
+        {group.heading && <h3 class="pericope-heading">{group.heading}</h3>}
+        <p class="pericope-body">
+          {group.verses.map((v) => (
+            <>
+              <span class="verse" id={`v${v.verse_num}`} data-verse-id={v.verse_id} data-translations={JSON.stringify(v.translations)}>
+                <a href={`#v${v.verse_num}`} class="verse-num" aria-expanded="false" aria-controls={`panel-${v.verse_id}`}>{v.verse_num}</a>
+                <span class="verse-text">{v.translations[primary] ?? <em>[translation pending]</em>}</span>{" "}
+              </span>
+              <VersePanel verse={v} primaryCodes={primaryCodes} />
+            </>
+          ))}
+        </p>
+      </section>
+    ))}
+  </div>
+</Base>
+<style is:inline>
+  kbd {
+    display: inline-block;
+    border: 1px solid var(--rule);
+    background: var(--bg-elev);
+    padding: 0 0.3rem;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+  }
+</style>
