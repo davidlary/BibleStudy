@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 const { title = "BibleStudy" } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -9,13 +10,18 @@ const { title = "BibleStudy" } = Astro.props;
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title}</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b6f3f'%3E%3Cpath d='M19 2H8C6.9 2 6 2.9 6 4v16c0 1.1.9 2 2 2h11V2zm-2 16H8V4h9v14z'/%3E%3C/svg%3E" />
+  <script is:inline define:vars={{ base }}>
+    window.__BS_BASE = base;
+  </script>
 </head>
 <body>
   <header class="topbar">
-    <a href={`${import.meta.env.BASE_URL}/`} class="brand">BibleStudy</a>
+    <a href={`${base}/`} class="brand">BibleStudy</a>
     <nav>
-      <a href={`${import.meta.env.BASE_URL}/`}>Home</a>
-      <a href={`${import.meta.env.BASE_URL}/genesis/1/`}>Genesis 1</a>
+      <a href={`${base}/`}>Home</a>
+      <a href={`${base}/genesis/1/`}>Genesis 1</a>
+      <a href={`${base}/settings/`}>Settings</a>
+      <button class="cmdk-trigger" type="button" title="Open passage palette (Cmd+K)" onclick="window.dispatchEvent(new KeyboardEvent('keydown', {key:'k', metaKey:true}))">⌘K</button>
     </nav>
   </header>
   <main>
@@ -27,5 +33,19 @@ const { title = "BibleStudy" } = Astro.props;
     <br />
     Hosted on GitHub Pages + Cloudflare Pages from <a href="https://github.com/davidlary/BibleStudy">davidlary/BibleStudy</a>.
   </footer>
+  <script is:inline src={`${base}/js/biblestudy.js`}></script>
 </body>
 </html>
+<style>
+  .cmdk-trigger {
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink-muted);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .cmdk-trigger:hover { color: var(--ink); border-color: var(--accent); }
+</style>

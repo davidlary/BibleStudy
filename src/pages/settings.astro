@@ -1,0 +1,166 @@
+---
+import Base from "../layouts/Base.astro";
+
+const allTranslations = [
+    { code: "asv", label: "ASV (1901, public domain)" },
+    { code: "bsb", label: "BSB (Berean Standard Bible, CC0)" },
+    { code: "kjv", label: "KJV (1611, public domain)" },
+    { code: "web", label: "WEB (World English Bible, CC0)" },
+    { code: "darby", label: "Darby (1890, public domain)" },
+    { code: "ylt", label: "Young's Literal (1862, public domain)" },
+    { code: "webster", label: "Webster (1833, public domain)" },
+    { code: "geneva", label: "Geneva (1599, public domain)" },
+    { code: "erv", label: "ERV (1885, public domain)" },
+    { code: "custom_v1", label: "Custom (LLM-generated, this project)" },
+];
+---
+<Base title="Settings · BibleStudy">
+  <h1>Settings</h1>
+  <p class="provenance">
+    Stored in your browser via <code>localStorage</code>. Settings persist
+    across sessions on this device. Reset cleared by clearing site data.
+  </p>
+
+  <h2>Translations</h2>
+  <p>Pick up to <strong>3</strong> translations to show on every chapter page. The first one is the primary (main reading); the others are accessible via the compare drawer (press <kbd>c</kbd>) or the keyboard shortcuts <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd>.</p>
+  <form id="trans-form" class="settings-form">
+    <ul class="trans-list">
+      {allTranslations.map((t) => (
+        <li>
+          <label>
+            <input type="checkbox" name="codes" value={t.code} />
+            <span>{t.label}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+    <p class="meta" id="trans-meta"></p>
+  </form>
+
+  <h2>Theme</h2>
+  <form id="theme-form" class="settings-form">
+    <label><input type="radio" name="theme" value="auto" checked> Auto (follow system)</label><br/>
+    <label><input type="radio" name="theme" value="light"> Light (warm paper)</label><br/>
+    <label><input type="radio" name="theme" value="dark"> Dark (deep slate)</label>
+  </form>
+
+  <h2>Reading mode</h2>
+  <form id="mode-form" class="settings-form">
+    <label><input type="radio" name="mode" value="generous" checked> Generous — wider column, larger type</label><br/>
+    <label><input type="radio" name="mode" value="compact"> Compact — narrower column, denser layout</label>
+  </form>
+
+  <h2>Default panels</h2>
+  <p>Which Detail panels open automatically when you click a verse:</p>
+  <form id="panel-form" class="settings-form">
+    <label><input type="checkbox" name="panel" value="translations" checked> Translations</label><br/>
+    <label><input type="checkbox" name="panel" value="interlinear"> Interlinear</label><br/>
+    <label><input type="checkbox" name="panel" value="xrefs"> Cross-refs</label><br/>
+    <label><input type="checkbox" name="panel" value="exegesis"> Exegesis</label>
+  </form>
+
+  <h2>LLM provider</h2>
+  <p>The Settings record what the BibleStudyTool authoring side should use when generating new exegeses + translations. The static site itself does not call any LLM.</p>
+  <form id="llm-form" class="settings-form">
+    <label><input type="radio" name="llm" value="gemini" checked> Gemini 2.5 Pro (cloud, ~$1/verse)</label><br/>
+    <label><input type="radio" name="llm" value="ollama"> Ollama (local, free, ~free runtime)</label>
+  </form>
+
+  <p style="margin-top: 2rem;">
+    <button id="reset-btn" type="button" class="settings-btn">Reset to defaults</button>
+  </p>
+
+  <script is:inline>
+    (function () {
+      const KEY = "biblestudy.settings.v1";
+      const DEFAULTS = {
+        codes: ["asv", "bsb", "kjv"],
+        theme: "auto",
+        mode: "generous",
+        panels: ["translations"],
+        llm: "gemini",
+      };
+      function load() {
+        try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch { return DEFAULTS; }
+      }
+      function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
+
+      function applyToForm() {
+        const s = load();
+        document.querySelectorAll('input[name="codes"]').forEach(i => { i.checked = s.codes.includes(i.value); });
+        document.querySelectorAll('input[name="theme"]').forEach(i => { i.checked = (i.value === s.theme); });
+        document.querySelectorAll('input[name="mode"]').forEach(i => { i.checked = (i.value === s.mode); });
+        document.querySelectorAll('input[name="panel"]').forEach(i => { i.checked = s.panels.includes(i.value); });
+        document.querySelectorAll('input[name="llm"]').forEach(i => { i.checked = (i.value === s.llm); });
+        updateMeta();
+      }
+
+      function updateMeta() {
+        const checked = Array.from(document.querySelectorAll('input[name="codes"]:checked')).map(i => i.value);
+        const meta = document.getElementById('trans-meta');
+        meta.textContent = `Selected: ${checked.length} / 3 — ${checked.join(', ') || '(none)'}`;
+        meta.style.color = checked.length > 3 ? '#c44' : 'var(--ink-muted)';
+      }
+
+      function readForms() {
+        const codes = Array.from(document.querySelectorAll('input[name="codes"]:checked')).map(i => i.value);
+        if (codes.length > 3) {
+          // Trim from the end; warn the user.
+          while (codes.length > 3) {
+            const last = codes.pop();
+            const inp = document.querySelector(`input[name="codes"][value="${last}"]`);
+            if (inp) inp.checked = false;
+          }
+        }
+        const theme = (document.querySelector('input[name="theme"]:checked') || {}).value || 'auto';
+        const mode = (document.querySelector('input[name="mode"]:checked') || {}).value || 'generous';
+        const panels = Array.from(document.querySelectorAll('input[name="panel"]:checked')).map(i => i.value);
+        const llm = (document.querySelector('input[name="llm"]:checked') || {}).value || 'gemini';
+        return { codes, theme, mode, panels, llm };
+      }
+
+      document.querySelectorAll('input').forEach(i => i.addEventListener('change', () => {
+        save(readForms());
+        updateMeta();
+        // Theme apply immediately
+        const s = readForms();
+        document.documentElement.dataset.theme = (s.theme === 'auto' ? '' : s.theme);
+      }));
+
+      document.getElementById('reset-btn').addEventListener('click', () => {
+        if (confirm('Reset all settings to defaults?')) {
+          localStorage.removeItem(KEY);
+          applyToForm();
+        }
+      });
+
+      applyToForm();
+    })();
+  </script>
+</Base>
+<style is:inline>
+  .settings-form { font-family: var(--sans); font-size: 0.92rem; }
+  .settings-form label { line-height: 1.8; }
+  .trans-list { list-style: none; padding: 0; columns: 2; column-gap: 1.5rem; }
+  .trans-list li { break-inside: avoid; padding: 0.15rem 0; }
+  kbd {
+    display: inline-block;
+    border: 1px solid var(--rule);
+    background: var(--bg-elev);
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+  }
+  .settings-btn {
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .settings-btn:hover { background: var(--bg); border-color: var(--accent); }
+</style>

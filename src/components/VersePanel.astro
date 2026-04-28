@@ -1,0 +1,177 @@
+---
+// Verse-detail panel — Phase D2 of v2 plan.
+//
+// Receives the verse-data dict emitted by `bst emit-static` (one row
+// from the chapter's `verses` array). Renders inline-expandable
+// content with a tab strip: Translations · Interlinear · Cross-refs ·
+// Exegesis · Places · Chronology · Slides · Song.
+//
+// Heavy panels (Maps, Chronology, Slides, Song) are flagged
+// data-lazy and hydrate when first opened — keeps initial bundle
+// small even when a chapter has hundreds of verses each carrying
+// rich data.
+const { verse, primaryCodes } = Astro.props;
+---
+<aside class="verse-panel" data-verse-id={verse.verse_id}>
+  <div class="vp-tabs" role="tablist">
+    <button class="vp-tab is-active" data-tab="translations" role="tab" aria-selected="true">Translations</button>
+    <button class="vp-tab" data-tab="interlinear" role="tab" aria-selected="false">Interlinear</button>
+    <button class="vp-tab" data-tab="xrefs" role="tab" aria-selected="false">Cross-refs</button>
+    <button class="vp-tab" data-tab="exegesis" role="tab" aria-selected="false">Exegesis</button>
+    <button class="vp-tab" data-tab="places" role="tab" aria-selected="false" data-lazy="true">Places</button>
+    <button class="vp-tab" data-tab="chronology" role="tab" aria-selected="false" data-lazy="true">Chronology</button>
+    <button class="vp-tab" data-tab="slides" role="tab" aria-selected="false" data-lazy="true">Slides</button>
+    <button class="vp-tab" data-tab="song" role="tab" aria-selected="false" data-lazy="true">Song</button>
+  </div>
+
+  <!-- Translations panel (default open) -->
+  <section class="vp-section is-active" data-pane="translations" role="tabpanel">
+    {primaryCodes.map((code) => (
+      <p class="vp-translation" data-code={code}>
+        <strong class="vp-code">{code.toUpperCase()}</strong>
+        <span class="vp-text">
+          {verse.translations[code] ?? <em class="vp-pending">[translation not yet generated]</em>}
+        </span>
+      </p>
+    ))}
+    {verse.translations.custom_v1 && (
+      <p class="vp-translation vp-custom">
+        <strong class="vp-code">CUSTOM</strong>
+        <span class="vp-text">{verse.translations.custom_v1}</span>
+      </p>
+    )}
+  </section>
+
+  <!-- Interlinear panel -->
+  <section class="vp-section" data-pane="interlinear" role="tabpanel" hidden>
+    {verse.interlinear.length > 0 ? (
+      <div class="vp-interlinear" data-lang={verse.interlinear[0]?.lang}>
+        {verse.interlinear.map((w) => (
+          <span class="vp-word" tabindex="0">
+            <span class="vp-surface">{w.surface}</span>
+            <span class="vp-translit">{w.transliteration}</span>
+            <span class="vp-tooltip">
+              <strong>{w.lemma}</strong>{" "}
+              <span class="vp-strongs">[{w.strongs}]</span><br />
+              <em>{w.morph}</em><br />
+              "{w.gloss}"
+            </span>
+          </span>
+        ))}
+      </div>
+    ) : (
+      <p class="vp-empty">Interlinear data not yet ingested for this verse.</p>
+    )}
+  </section>
+
+  <!-- Cross-references panel -->
+  <section class="vp-section" data-pane="xrefs" role="tabpanel" hidden>
+    {verse.cross_refs.length > 0 ? (
+      <ul class="vp-xrefs">
+        {verse.cross_refs.map((x) => (
+          <li>
+            <a href={`#xref-${x.to_ref}`} class="vp-xref-link" data-target={x.to_ref}>
+              {x.to_ref}
+            </a>
+            <span class="vp-votes">votes {x.votes}</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="vp-empty">No cross-references indexed yet for this verse.</p>
+    )}
+  </section>
+
+  <!-- Exegesis panel -->
+  <section class="vp-section" data-pane="exegesis" role="tabpanel" hidden>
+    {verse.exegesis_md ? (
+      <div class="vp-exegesis-md" set:html={verse.exegesis_md} />
+    ) : (
+      <p class="vp-empty">
+        Exegesis not yet generated for this verse. Generate one with the
+        BibleStudyTool chat-thread workflow, then run <code>bst emit-static</code>
+        to fold it in.
+      </p>
+    )}
+  </section>
+
+  <!-- Places panel (lazy: hydrates when tab clicked) -->
+  <section class="vp-section" data-pane="places" role="tabpanel" hidden>
+    {verse.places.length > 0 ? (
+      <>
+        <div class="vp-map" id={`map-${verse.verse_id}`} data-places={JSON.stringify(verse.places)}></div>
+        <ul class="vp-places-list">
+          {verse.places.map((p) => (
+            <li>
+              <strong>{p.primary_name}</strong>
+              {p.modern_name && <span class="vp-modern"> · modern: {p.modern_name}</span>}
+              {p.alt_names.length > 0 && (
+                <span class="vp-alt"> · also called {p.alt_names.join(", ")}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </>
+    ) : (
+      <p class="vp-empty">No places mentioned in this verse.</p>
+    )}
+  </section>
+
+  <!-- Chronology panel (lazy) -->
+  <section class="vp-section" data-pane="chronology" role="tabpanel" hidden>
+    {verse.chronology.length > 0 ? (
+      <div class="vp-timeline" data-events={JSON.stringify(verse.chronology)}>
+        <ul>
+          {verse.chronology.map((e) => (
+            <li class={`vp-event vp-era-${e.era}`}>
+              <span class="vp-year">
+                {e.bc_ad_year !== null && e.bc_ad_year !== undefined
+                  ? `${Math.abs(e.bc_ad_year)} ${e.bc_ad_year < 0 ? "BC" : "AD"}`
+                  : "—"}
+              </span>
+              <span class="vp-event-name">{e.event}</span>
+              <span class="vp-certainty" title={e.era}>[{e.certainty}]</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ) : (
+      <p class="vp-empty">No chronology events linked to this verse.</p>
+    )}
+  </section>
+
+  <!-- Slides panel (lazy) -->
+  <section class="vp-section" data-pane="slides" role="tabpanel" hidden>
+    {verse.slides && verse.slides.length > 0 ? (
+      <div class="vp-slides-grid">
+        {verse.slides.map((s) => (
+          <a href={s.full_url} class="vp-slide-thumb" target="_blank" rel="noopener">
+            <img src={s.thumb_url} alt={s.title} loading="lazy" />
+            <span class="vp-slide-title">{s.title}</span>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p class="vp-empty">
+        No slides generated yet. Run a slide deck via BibleStudyTool's
+        Workflow page for this passage.
+      </p>
+    )}
+  </section>
+
+  <!-- Song panel (lazy) -->
+  <section class="vp-section" data-pane="song" role="tabpanel" hidden>
+    {verse.song ? (
+      <div class="vp-song">
+        <pre class="vp-lyrics">{verse.song.lyrics}</pre>
+        {verse.song.style && <p class="vp-style"><strong>Style:</strong> {verse.song.style}</p>}
+        <button class="vp-suno-copy" data-target={`vp-lyrics-${verse.verse_id}`}>Copy lyrics</button>
+      </div>
+    ) : (
+      <p class="vp-empty">
+        No song generated yet. Run the song flow in BibleStudyTool, then
+        re-emit this chapter.
+      </p>
+    )}
+  </section>
+</aside>
