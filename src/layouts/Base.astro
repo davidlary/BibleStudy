@@ -2,6 +2,20 @@
 import "../styles/global.css";
 const { title = "BibleStudy" } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Derive a passage breadcrumb from the URL so the top bar reflects
+// the chapter the reader is currently viewing instead of a hardcoded
+// link. Pattern: /<base>/<book-slug>/<chapter>/
+const path = Astro.url.pathname.replace(base, "").replace(/^\/+/, "");
+const m = path.match(/^([a-z0-9-]+)\/(\d+)\/?/i);
+const breadcrumbBook = m ? m[1] : "";
+const breadcrumbChapter = m ? m[2] : "";
+const breadcrumbDisplay = breadcrumbBook
+  ? breadcrumbBook
+      .split("-")
+      .map(w => /^\d+$/.test(w) ? w : w[0].toUpperCase() + w.slice(1))
+      .join(" ") + " " + breadcrumbChapter
+  : "";
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -17,11 +31,20 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 <body>
   <header class="topbar">
     <a href={`${base}/`} class="brand">BibleStudy</a>
+    {breadcrumbDisplay && (
+      <span class="breadcrumb">
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-passage">{breadcrumbDisplay}</span>
+      </span>
+    )}
     <nav>
-      <a href={`${base}/`}>Home</a>
-      <a href={`${base}/genesis/1/`}>Genesis 1</a>
-      <a href={`${base}/settings/`}>Settings</a>
-      <button class="cmdk-trigger" type="button" title="Open passage palette (Cmd+K)" onclick="window.dispatchEvent(new KeyboardEvent('keydown', {key:'k', metaKey:true}))">⌘K</button>
+      <button class="topbar-btn cmdk-trigger" type="button" title="Open passage palette (Cmd+K) — type any book + chapter+verse"
+              onclick="window.dispatchEvent(new KeyboardEvent('keydown', {key:'k', metaKey:true}))">
+        <span class="cmdk-label">Jump to passage</span>
+        <span class="cmdk-shortcut">⌘K</span>
+      </button>
+      <a class="topbar-btn" href={`${base}/`} title="All books and chapters">📖 Books</a>
+      <a class="topbar-btn" href={`${base}/settings/`} title="Settings">⚙</a>
     </nav>
   </header>
   <main>
@@ -37,15 +60,53 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 </body>
 </html>
 <style>
-  .cmdk-trigger {
+  .breadcrumb {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--ink-muted);
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .breadcrumb-sep {
+    color: var(--rule);
+    font-size: 1rem;
+  }
+  .breadcrumb-passage {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .topbar-btn {
     background: transparent;
     border: 1px solid var(--rule);
     color: var(--ink-muted);
-    padding: 0.2rem 0.55rem;
+    padding: 0.25rem 0.65rem;
     border-radius: 4px;
-    font-family: var(--mono);
-    font-size: 0.78rem;
+    font-family: var(--sans);
+    font-size: 0.85rem;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
   }
-  .cmdk-trigger:hover { color: var(--ink); border-color: var(--accent); }
+  .topbar-btn:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+  .cmdk-shortcut {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    background: var(--bg-elev);
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    color: var(--ink-muted);
+  }
+  @media (max-width: 640px) {
+    .cmdk-label { display: none; }
+    .topbar-btn { padding: 0.25rem 0.45rem; }
+    .breadcrumb { display: none; }  /* avoid wrap */
+  }
 </style>
