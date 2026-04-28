@@ -42,52 +42,67 @@ const { verse, primaryCodes } = Astro.props;
     )}
   </section>
 
-  <!-- Interlinear panel — Phase D3 v2: tabular layout -->
+  <!-- Interlinear panel — Phase D3 v3: scrollable table + dynamic columns -->
   <section class="vp-section" data-pane="interlinear" role="tabpanel" hidden>
     {verse.interlinear.length > 0 ? (
-      <table class="vp-interlinear-table" data-lang={verse.interlinear[0]?.lang}>
-        <thead>
-          <tr>
-            <th class="vp-col-num">#</th>
-            <th class="vp-col-orig">Hebrew/Greek</th>
-            <th class="vp-col-translit">Transliteration</th>
-            <th class="vp-col-strongs">Strong's</th>
-            <th class="vp-col-lemma">Lemma</th>
-            <th class="vp-col-morph">Parsing</th>
-            <th class="vp-col-gloss">Gloss</th>
-          </tr>
-        </thead>
-        <tbody>
-          {verse.interlinear.map((w) => (
-            <tr>
-              <td class="vp-col-num">{w.position}</td>
-              <td class="vp-col-orig"><span class="vp-surface">{w.surface}</span></td>
-              <td class="vp-col-translit">{w.transliteration || ""}</td>
-              <td class="vp-col-strongs">
-                {w.strongs ? <code class="vp-strongs">{w.strongs}</code> : ""}
-              </td>
-              <td class="vp-col-lemma">{w.lemma}</td>
-              <td class="vp-col-morph"><code>{w.morph}</code></td>
-              <td class="vp-col-gloss"><em>{w.gloss || "—"}</em></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      (() => {
+        // Detect which optional columns have any content; hide those
+        // with all-empty cells so we don't waste horizontal space.
+        const has_translit = verse.interlinear.some(w => (w.transliteration || "").trim());
+        const has_gloss    = verse.interlinear.some(w => (w.gloss || "").trim());
+        const has_strongs  = verse.interlinear.some(w => (w.strongs || "").trim());
+        const has_lemma    = verse.interlinear.some(w => (w.lemma || "").trim());
+        const has_morph    = verse.interlinear.some(w => (w.morph || "").trim());
+        return (
+          <div class="vp-interlinear-scroll">
+            <table class="vp-interlinear-table" data-lang={verse.interlinear[0]?.lang}>
+              <thead>
+                <tr>
+                  <th class="vp-col-num">#</th>
+                  <th class="vp-col-orig">Hebrew/Greek</th>
+                  {has_translit && <th class="vp-col-translit">Transliteration</th>}
+                  {has_strongs && <th class="vp-col-strongs">Strong's</th>}
+                  {has_lemma && <th class="vp-col-lemma">Lemma</th>}
+                  {has_morph && <th class="vp-col-morph">Parsing</th>}
+                  {has_gloss && <th class="vp-col-gloss">Gloss</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {verse.interlinear.map((w) => (
+                  <tr>
+                    <td class="vp-col-num">{w.position}</td>
+                    <td class="vp-col-orig"><span class="vp-surface">{w.surface}</span></td>
+                    {has_translit && <td class="vp-col-translit"><em>{w.transliteration}</em></td>}
+                    {has_strongs && (
+                      <td class="vp-col-strongs">
+                        {w.strongs ? <code class="vp-strongs">{w.strongs}</code> : ""}
+                      </td>
+                    )}
+                    {has_lemma && <td class="vp-col-lemma">{w.lemma}</td>}
+                    {has_morph && <td class="vp-col-morph"><code>{w.morph}</code></td>}
+                    {has_gloss && <td class="vp-col-gloss"><em>{w.gloss || "—"}</em></td>}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })()
     ) : (
       <p class="vp-empty">Interlinear data not yet ingested for this verse.</p>
     )}
   </section>
 
-  <!-- Cross-references panel -->
+  <!-- Cross-references panel — Phase D3 v3 (human display + base-url fix-up) -->
   <section class="vp-section" data-pane="xrefs" role="tabpanel" hidden>
     {verse.cross_refs.length > 0 ? (
       <ul class="vp-xrefs">
         {verse.cross_refs.map((x) => (
           <li>
-            <a href={`#xref-${x.to_ref}`} class="vp-xref-link" data-target={x.to_ref}>
-              {x.to_ref}
-            </a>
-            <span class="vp-votes">votes {x.votes}</span>
+            {x.href
+              ? <a class="vp-xref-link" data-href={x.href}>{x.display}</a>
+              : <span class="vp-xref-bare">{x.display}</span>
+            }
           </li>
         ))}
       </ul>
@@ -129,19 +144,34 @@ const { verse, primaryCodes } = Astro.props;
           "phase_a_text", "phase_b_thesis", "phase_c_big_picture",
           "phase_d_setting", "phase_e_verse_craft", "phase_f_canonical",
           "phase_g_applications", "memory_anchor", "devotional_summary", "retention_quiz",
-        ].filter((k) => verse.exegesis_sections[k]).map((k, i) => (
-          <article class={`vp-exegesis-md vp-subpane${i === 0 ? " is-active" : ""}`} data-subpane={k} hidden={i !== 0}>
-            <pre class="vp-md-source">{verse.exegesis_sections[k]}</pre>
-          </article>
-        ))}
+        ].filter((k) => verse.exegesis_sections[k]).map((k, i) => {
+          const html_key = k + "_html";
+          return (
+            <article class={`vp-exegesis-md vp-subpane${i === 0 ? " is-active" : ""}`} data-subpane={k} hidden={i !== 0}>
+              {verse.exegesis_sections[html_key]
+                ? <div class="vp-md-rendered" set:html={verse.exegesis_sections[html_key]} />
+                : <pre class="vp-md-source">{verse.exegesis_sections[k]}</pre>
+              }
+            </article>
+          );
+        })}
         <details class="vp-audit-toggle">
           <summary>Show audit metadata (Pre-Output Scorecard, Pipeline Coherence Check, Slide Deck Sidecar, Cover Art Prompts)</summary>
-          {Object.entries(verse.exegesis_sections._audit || {}).filter(([_k, v]) => v).map(([k, v]) => (
-            <article class="vp-audit-section" data-audit={k}>
-              <h4>{k.replace(/_/g, " ")}</h4>
-              <pre class="vp-md-source">{v}</pre>
-            </article>
-          ))}
+          {Object.entries(verse.exegesis_sections._audit || {})
+            .filter(([k, v]) => v && !k.endsWith("_html"))
+            .map(([k, v]) => {
+              const html_key = k + "_html";
+              const html = verse.exegesis_sections._audit[html_key];
+              return (
+                <article class="vp-audit-section" data-audit={k}>
+                  <h4>{k.replace(/_/g, " ")}</h4>
+                  {html
+                    ? <div class="vp-md-rendered" set:html={html} />
+                    : <pre class="vp-md-source">{v}</pre>
+                  }
+                </article>
+              );
+            })}
         </details>
       </div>
     ) : verse.exegesis_md ? (

@@ -256,14 +256,29 @@ pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; ove
 .vp-translation.vp-custom .vp-code { color: var(--accent); }
 .vp-pending { color: var(--ink-muted); }
 
-/* Interlinear — tabular */
+/* Interlinear — tabular, horizontally scrollable */
+.vp-interlinear-scroll {
+    overflow-x: auto;
+    margin: 0.4rem 0 0.8rem;
+    /* Subtle scroll-shadow when overflow is present */
+    background:
+        linear-gradient(to right, var(--bg-elev) 0%, transparent 5%),
+        linear-gradient(to right, transparent 95%, var(--bg-elev) 100%);
+    background-attachment: local, local;
+}
 .vp-interlinear-table {
-    width: 100%;
     border-collapse: collapse;
     font-family: var(--sans);
     font-size: 0.88rem;
-    margin: 0.4rem 0 0.8rem;
+    /* min-width + table-layout:auto so columns shrink to content but
+       the whole table can be wider than the panel (panel scrolls). */
+    min-width: 100%;
+    table-layout: auto;
+    white-space: nowrap;
 }
+.vp-interlinear-table .vp-col-translit,
+.vp-interlinear-table .vp-col-lemma,
+.vp-interlinear-table .vp-col-gloss { white-space: normal; }
 .vp-interlinear-table thead th {
     text-align: left;
     padding: 0.4rem 0.5rem;
@@ -352,10 +367,29 @@ pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; ove
 .vp-word:hover .vp-tooltip, .vp-word:focus-visible .vp-tooltip { display: block; }
 .vp-strongs { color: var(--accent-muted); font-family: var(--mono); font-size: 0.78rem; }
 
-/* Cross-refs */
-.vp-xrefs { list-style: none; padding: 0; margin: 0; column-count: 2; column-gap: 1.5rem; }
-.vp-xrefs li { break-inside: avoid; padding: 0.2rem 0; display: flex; justify-content: space-between; }
-.vp-votes { color: var(--ink-muted); font-size: 0.78rem; font-family: var(--mono); }
+/* Cross-refs — Phase D3 v3: clean two-column list with no engineering noise */
+.vp-xrefs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    column-count: 2;
+    column-gap: 1.5rem;
+    font-family: var(--sans);
+    font-size: 0.92rem;
+}
+.vp-xrefs li {
+    break-inside: avoid;
+    padding: 0.18rem 0;
+}
+.vp-xref-link {
+    color: var(--link);
+    cursor: pointer;
+}
+.vp-xref-link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.vp-xref-bare { color: var(--ink); }
+@media (max-width: 640px) {
+    .vp-xrefs { column-count: 1; }
+}
 
 /* Exegesis */
 .vp-exegesis-md h3, .vp-exegesis-md h4 { margin-top: 0.8rem; }
@@ -373,6 +407,105 @@ pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; ove
     max-height: 60vh;
     overflow-y: auto;
 }
+
+/* Server-rendered markdown — Phase D3 v3 */
+.vp-md-rendered {
+    font-family: var(--serif);
+    font-size: 1rem;
+    line-height: 1.65;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+.vp-md-rendered h1, .vp-md-rendered h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0.4rem 0 0.5rem;
+    border: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    padding: 0;
+}
+.vp-md-rendered h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0.9rem 0 0.4rem;
+    color: var(--accent);
+}
+.vp-md-rendered h4 {
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin: 0.7rem 0 0.3rem;
+}
+.vp-md-rendered p { margin: 0 0 0.7rem; }
+.vp-md-rendered strong { font-weight: 700; }
+.vp-md-rendered em { font-style: italic; }
+.vp-md-rendered ul, .vp-md-rendered ol {
+    margin: 0.5rem 0 0.8rem;
+    padding-left: 1.4rem;
+}
+.vp-md-rendered li { margin-bottom: 0.25rem; }
+.vp-md-rendered code {
+    font-family: var(--mono);
+    background: var(--bg);
+    padding: 0.05em 0.35em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: var(--accent);
+}
+.vp-md-rendered pre {
+    background: var(--bg);
+    padding: 0.7rem 0.9rem;
+    border-radius: 4px;
+    border: 1px solid var(--rule);
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.55;
+}
+.vp-md-rendered pre code {
+    background: transparent;
+    padding: 0;
+    color: var(--ink);
+    border-radius: 0;
+}
+.vp-md-rendered blockquote {
+    margin: 0.8rem 0;
+    padding: 0.4rem 1rem;
+    border-left: 3px solid var(--accent-muted);
+    color: var(--ink-muted);
+    background: var(--bg);
+}
+.vp-md-rendered table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8rem 0;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    display: block;
+    overflow-x: auto;
+}
+.vp-md-rendered table th, .vp-md-rendered table td {
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+}
+.vp-md-rendered table thead th {
+    background: var(--bg);
+    border-bottom: 2px solid var(--rule);
+    font-weight: 600;
+}
+.vp-md-rendered hr {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 1rem 0;
+}
+.vp-md-rendered a {
+    color: var(--link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.vp-md-rendered a:hover { color: var(--accent); }
 .vp-exegesis-tabs {
     display: flex;
     flex-direction: column;

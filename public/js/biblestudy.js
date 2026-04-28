@@ -25,6 +25,21 @@
     if (window.__biblestudy_loaded) return;
     window.__biblestudy_loaded = true;
 
+    // -----------------------------------------------------------------
+    // Cross-ref href fix-up: emitter ships data-href="/<slug>/<chap>/#vN"
+    // (no base prefix — Python doesn't know what BASE_URL is at build
+    // time). Client-side, prepend window.__BS_BASE so the link works in
+    // both dev (no base) and prod (/BibleStudy/...).
+    // -----------------------------------------------------------------
+    document.addEventListener("click", (e) => {
+        const link = e.target.closest(".vp-xref-link[data-href]");
+        if (!link) return;
+        e.preventDefault();
+        const base = (window.__BS_BASE || "").replace(/\/$/, "");
+        const href = link.dataset.href;
+        window.location.href = base + href;
+    });
+
     const SETTINGS_KEY = "biblestudy.settings.v1";
 
     function loadSettings() {
