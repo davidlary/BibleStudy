@@ -6379,7 +6379,7 @@ const pericope_groups = groupByPericope(verses, pericopes);
     {pericope_groups.map((group) => (
       <section class="pericope" data-peri-id={group.peri_id || ""}>
         {group.heading && <h3 class="pericope-heading">{group.heading}</h3>}
-        <p class="pericope-body">
+        <div class="pericope-body">
           {group.verses.map((v) => (
             <>
               <span class="verse" id={`v${v.verse_num}`} data-verse-id={v.verse_id} data-translations={JSON.stringify(v.translations)}>
@@ -6389,7 +6389,7 @@ const pericope_groups = groupByPericope(verses, pericopes);
               <VersePanel verse={v} primaryCodes={primaryCodes} />
             </>
           ))}
-        </p>
+        </div>
       </section>
     ))}
   </div>
