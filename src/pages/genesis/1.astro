@@ -6384,7 +6384,16 @@ const pericope_groups = groupByPericope(verses, pericopes);
             <>
               <span class="verse" id={`v${v.verse_num}`} data-verse-id={v.verse_id} data-translations={JSON.stringify(v.translations)}>
                 <a href={`#v${v.verse_num}`} class="verse-num" aria-expanded="false" aria-controls={`panel-${v.verse_id}`}>{v.verse_num}</a>
-                <span class="verse-text">{v.translations[primary] ?? <em>[translation pending]</em>}</span>{" "}
+                <span class="verse-text">{
+                  // Show the primary code's text; if that's null/missing,
+                  // fall back to the first non-null translation we have
+                  // (so we never show "[translation pending]" when SOME
+                  // translation is loaded). Only when nothing is loaded
+                  // do we show the placeholder.
+                  v.translations[primary] ??
+                    (Object.values(v.translations).find(t => t) ??
+                      <em>[translation pending]</em>)
+                }</span>{" "}
               </span>
               <VersePanel verse={v} primaryCodes={primaryCodes} />
             </>

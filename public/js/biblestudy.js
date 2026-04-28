@@ -391,16 +391,53 @@
     });
 
     function swapPrimary(code) {
+        let updated = 0;
+        let missing = 0;
         document.querySelectorAll(".verse[data-translations]").forEach((v) => {
             try {
                 const map = JSON.parse(v.dataset.translations);
-                if (map[code]) v.dataset.primaryCode = code;
                 const txt = v.querySelector(".verse-text");
-                if (txt && map[code]) txt.textContent = map[code];
+                if (!txt) return;
+                if (map[code]) {
+                    v.dataset.primaryCode = code;
+                    txt.textContent = map[code];
+                    updated++;
+                } else {
+                    // Fall back to the first non-null translation; if
+                    // none, render the original placeholder marker.
+                    const firstAvailable = Object.values(map).find(t => t);
+                    if (firstAvailable) {
+                        txt.textContent = firstAvailable;
+                    } else {
+                        txt.innerHTML = "<em>[translation pending]</em>";
+                    }
+                    missing++;
+                }
             } catch {}
         });
         const note = document.querySelector(".provenance-active");
-        if (note) note.textContent = `Showing: ${code.toUpperCase()}`;
+        if (note) note.textContent = code.toUpperCase();
+        // Visible toast so the user knows the keystroke registered even
+        // if no translations swap (e.g. when only KJV is loaded and they
+        // press '1' for ASV).
+        _flashToast(
+            updated > 0
+                ? `Switched to ${code.toUpperCase()} (${updated} verse${updated === 1 ? "" : "s"})`
+                : `${code.toUpperCase()} not yet ingested for this chapter (${missing} verse${missing === 1 ? "" : "s"} unchanged)`
+        );
+    }
+
+    let _toastEl = null;
+    function _flashToast(msg) {
+        if (!_toastEl) {
+            _toastEl = document.createElement("div");
+            _toastEl.className = "bs-toast";
+            document.body.appendChild(_toastEl);
+        }
+        _toastEl.textContent = msg;
+        _toastEl.classList.add("is-visible");
+        clearTimeout(_toastEl._t);
+        _toastEl._t = setTimeout(() => _toastEl.classList.remove("is-visible"), 2000);
     }
 
     // -----------------------------------------------------------------

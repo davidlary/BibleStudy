@@ -772,6 +772,29 @@ pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; ove
     cursor: pointer;
 }
 
+/* Toast — small bottom-right popup for hotkey feedback */
+.bs-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 0.6rem 0.95rem;
+    border-radius: 5px;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 200ms ease, transform 200ms ease;
+    z-index: 400;
+    pointer-events: none;
+}
+.bs-toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* Cmd+K palette (Phase D9) */
 .cmdk-overlay {
     position: fixed;
