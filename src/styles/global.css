@@ -360,6 +360,86 @@ pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; ove
 /* Exegesis */
 .vp-exegesis-md h3, .vp-exegesis-md h4 { margin-top: 0.8rem; }
 .vp-exegesis-md p { margin-bottom: 0.6rem; }
+.vp-md-source {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: var(--serif);
+    font-size: 1rem;
+    line-height: 1.6;
+    background: transparent;
+    padding: 0;
+    border: 0;
+    margin: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.vp-exegesis-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.vp-exegesis-subtabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--sans);
+    font-size: 0.78rem;
+}
+.vp-subtab {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--ink-muted);
+    padding: 0.25rem 0.55rem;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast);
+}
+.vp-subtab:hover { color: var(--ink); background: var(--bg); }
+.vp-subtab.is-active {
+    color: var(--ink);
+    background: var(--bg);
+    border-color: var(--rule);
+    box-shadow: inset 0 -2px 0 var(--accent);
+}
+.vp-subpane[hidden] { display: none; }
+.vp-audit-toggle {
+    margin-top: 0.8rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--rule);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+}
+.vp-audit-toggle summary {
+    cursor: pointer;
+    color: var(--ink-muted);
+    padding: 0.3rem 0;
+}
+.vp-audit-toggle summary:hover { color: var(--ink); }
+.vp-audit-section {
+    margin: 0.8rem 0;
+    padding: 0.6rem 0.8rem;
+    background: var(--bg);
+    border-left: 2px solid var(--ink-muted);
+    border-radius: 0 4px 4px 0;
+    font-size: 0.85rem;
+}
+.vp-audit-section h4 {
+    margin: 0 0 0.4rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+}
+.vp-banner-yellow {
+    background: #fef3c7;
+    border-left: 3px solid #f59e0b;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0 4px 4px 0;
+    color: #78350f;
+    font-size: 0.88rem;
+}
 
 /* Places + map */
 .vp-map {

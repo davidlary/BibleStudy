@@ -67,6 +67,54 @@
     });
 
     // -----------------------------------------------------------------
+    // G2: Exegesis sub-tab switching (per-phase)
+    // -----------------------------------------------------------------
+    document.addEventListener("click", (e) => {
+        const sub = e.target.closest(".vp-subtab");
+        if (!sub) return;
+        const tabs = sub.closest(".vp-exegesis-tabs");
+        if (!tabs) return;
+        const which = sub.dataset.subtab;
+        tabs.querySelectorAll(".vp-subtab").forEach((b) => {
+            const active = b === sub;
+            b.classList.toggle("is-active", active);
+            b.setAttribute("aria-selected", String(active));
+        });
+        tabs.querySelectorAll(".vp-subpane").forEach((p) => {
+            const show = p.dataset.subpane === which;
+            p.toggleAttribute("hidden", !show);
+            p.classList.toggle("is-active", show);
+        });
+    });
+
+    // G3: audit-metadata visibility — three input sources, OR-ed:
+    //   - URL `?audit=1` (per-visit power-user override)
+    //   - Settings { audit_default_open: true } (persistent)
+    //   - explicit user-click on the <details> element (default closed)
+    function _shouldOpenAudit() {
+        if (new URLSearchParams(location.search).get("audit")) return true;
+        const s = loadSettings();
+        return !!s.audit_default_open;
+    }
+    function _applyAuditPolicy(root) {
+        if (!_shouldOpenAudit()) return;
+        root.querySelectorAll(".vp-audit-toggle").forEach((d) => { d.open = true; });
+    }
+    _applyAuditPolicy(document);
+
+    // G3: open the user's preferred default exegesis sub-tab when
+    // a verse panel switches to the Exegesis pane for the first time.
+    function _applyDefaultPhase(panel) {
+        const s = loadSettings();
+        const want = s.phase || "phase_a_text";
+        const tabs = panel.querySelector(".vp-exegesis-tabs");
+        if (!tabs) return;
+        const target = tabs.querySelector(`.vp-subtab[data-subtab="${want}"]`);
+        if (!target || target.classList.contains("is-active")) return;
+        target.click();
+    }
+
+    // -----------------------------------------------------------------
     // D2/D3-D7: tab switching + lazy hydration
     // -----------------------------------------------------------------
     document.addEventListener("click", (e) => {
@@ -89,6 +137,12 @@
                 s.dataset.hydrated = "true";
             }
         });
+        // Phase G3: when the Exegesis pane first opens, jump to the
+        // user's preferred phase sub-tab.
+        if (which === "exegesis") {
+            _applyDefaultPhase(panel);
+            _applyAuditPolicy(panel);
+        }
     });
 
     async function hydratePane(section, paneName) {

@@ -59,6 +59,26 @@ const allTranslations = [
     <label><input type="checkbox" name="panel" value="exegesis"> Exegesis</label>
   </form>
 
+  <h2>Default exegesis sub-tab</h2>
+  <p>When you click a verse, the Exegesis panel opens at this sub-tab by default. Switching tabs once you're in the panel stays the same.</p>
+  <form id="phase-form" class="settings-form">
+    <label><input type="radio" name="phase" value="phase_a_text" checked> A · The Text</label><br/>
+    <label><input type="radio" name="phase" value="phase_b_thesis"> B · Thesis</label><br/>
+    <label><input type="radio" name="phase" value="phase_c_big_picture"> C · Big Picture</label><br/>
+    <label><input type="radio" name="phase" value="phase_d_setting"> D · Setting</label><br/>
+    <label><input type="radio" name="phase" value="phase_e_verse_craft"> E · Verse Craft</label><br/>
+    <label><input type="radio" name="phase" value="phase_f_canonical"> F · Canonical Connection</label><br/>
+    <label><input type="radio" name="phase" value="phase_g_applications"> G · Applications</label><br/>
+    <label><input type="radio" name="phase" value="memory_anchor"> Memory Anchor</label><br/>
+    <label><input type="radio" name="phase" value="devotional_summary"> Devotional Summary</label>
+  </form>
+
+  <h2>Audit metadata</h2>
+  <form id="audit-form" class="settings-form">
+    <label><input type="checkbox" name="audit_default_open"> Auto-expand audit metadata (Pre-Output Scorecard, Pipeline Coherence Check, Slide Deck Sidecar, Cover Art Prompts)</label><br/>
+    <p class="meta">Power-user override: append <code>?audit=1</code> to any chapter URL to expand audit metadata for that visit only.</p>
+  </form>
+
   <h2>LLM provider</h2>
   <p>The Settings record what the BibleStudyTool authoring side should use when generating new exegeses + translations. The static site itself does not call any LLM.</p>
   <form id="llm-form" class="settings-form">
@@ -79,6 +99,8 @@ const allTranslations = [
         mode: "generous",
         panels: ["translations"],
         llm: "gemini",
+        phase: "phase_a_text",
+        audit_default_open: false,
       };
       function load() {
         try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch { return DEFAULTS; }
@@ -92,6 +114,8 @@ const allTranslations = [
         document.querySelectorAll('input[name="mode"]').forEach(i => { i.checked = (i.value === s.mode); });
         document.querySelectorAll('input[name="panel"]').forEach(i => { i.checked = s.panels.includes(i.value); });
         document.querySelectorAll('input[name="llm"]').forEach(i => { i.checked = (i.value === s.llm); });
+        document.querySelectorAll('input[name="phase"]').forEach(i => { i.checked = (i.value === s.phase); });
+        document.querySelectorAll('input[name="audit_default_open"]').forEach(i => { i.checked = !!s.audit_default_open; });
         updateMeta();
       }
 
@@ -116,7 +140,9 @@ const allTranslations = [
         const mode = (document.querySelector('input[name="mode"]:checked') || {}).value || 'generous';
         const panels = Array.from(document.querySelectorAll('input[name="panel"]:checked')).map(i => i.value);
         const llm = (document.querySelector('input[name="llm"]:checked') || {}).value || 'gemini';
-        return { codes, theme, mode, panels, llm };
+        const phase = (document.querySelector('input[name="phase"]:checked') || {}).value || 'phase_a_text';
+        const audit_default_open = !!(document.querySelector('input[name="audit_default_open"]') || {}).checked;
+        return { codes, theme, mode, panels, llm, phase, audit_default_open };
       }
 
       document.querySelectorAll('input').forEach(i => i.addEventListener('change', () => {

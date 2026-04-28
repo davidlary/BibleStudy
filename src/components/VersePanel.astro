@@ -96,14 +96,62 @@ const { verse, primaryCodes } = Astro.props;
     )}
   </section>
 
-  <!-- Exegesis panel -->
+  <!-- Exegesis panel — Phase G2: per-phase sub-tabs -->
   <section class="vp-section" data-pane="exegesis" role="tabpanel" hidden>
-    {verse.exegesis_md ? (
-      <div class="vp-exegesis-md" set:html={verse.exegesis_md} />
+    {verse.exegesis_sections && verse.exegesis_sections._split_error ? (
+      <div class="vp-banner vp-banner-yellow">
+        Exegesis available but could not be split: {verse.exegesis_sections._split_error}
+      </div>
+    ) : verse.exegesis_sections ? (
+      <div class="vp-exegesis-tabs">
+        <nav class="vp-exegesis-subtabs" role="tablist" aria-label="Exegesis phases">
+          {[
+            ["phase_a_text", "A · The Text"],
+            ["phase_b_thesis", "B · Thesis"],
+            ["phase_c_big_picture", "C · Big Picture"],
+            ["phase_d_setting", "D · Setting"],
+            ["phase_e_verse_craft", "E · Verse Craft"],
+            ["phase_f_canonical", "F · Canonical"],
+            ["phase_g_applications", "G · Applications"],
+            ["memory_anchor", "Memory Anchor"],
+            ["devotional_summary", "Devotional"],
+            ["retention_quiz", "Quiz"],
+          ].filter(([k]) => verse.exegesis_sections[k]).map(([k, label], i) => (
+            <button
+              class={`vp-subtab${i === 0 ? " is-active" : ""}`}
+              data-subtab={k}
+              role="tab"
+              aria-selected={i === 0}
+            >{label}</button>
+          ))}
+        </nav>
+        {[
+          "phase_a_text", "phase_b_thesis", "phase_c_big_picture",
+          "phase_d_setting", "phase_e_verse_craft", "phase_f_canonical",
+          "phase_g_applications", "memory_anchor", "devotional_summary", "retention_quiz",
+        ].filter((k) => verse.exegesis_sections[k]).map((k, i) => (
+          <article class={`vp-exegesis-md vp-subpane${i === 0 ? " is-active" : ""}`} data-subpane={k} hidden={i !== 0}>
+            <pre class="vp-md-source">{verse.exegesis_sections[k]}</pre>
+          </article>
+        ))}
+        <details class="vp-audit-toggle">
+          <summary>Show audit metadata (Pre-Output Scorecard, Pipeline Coherence Check, Slide Deck Sidecar, Cover Art Prompts)</summary>
+          {Object.entries(verse.exegesis_sections._audit || {}).filter(([_k, v]) => v).map(([k, v]) => (
+            <article class="vp-audit-section" data-audit={k}>
+              <h4>{k.replace(/_/g, " ")}</h4>
+              <pre class="vp-md-source">{v}</pre>
+            </article>
+          ))}
+        </details>
+      </div>
+    ) : verse.exegesis_md ? (
+      <div class="vp-exegesis-md">
+        <pre class="vp-md-source">{verse.exegesis_md}</pre>
+      </div>
     ) : (
       <p class="vp-empty">
         Exegesis not yet generated for this verse. Generate one with the
-        BibleStudyTool chat-thread workflow, then run <code>bst emit-static</code>
+        BibleStudyTool chat-thread workflow, then run <code>bst emit-static --include-exegesis</code>
         to fold it in.
       </p>
     )}
