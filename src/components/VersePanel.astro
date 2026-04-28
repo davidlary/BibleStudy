@@ -24,20 +24,25 @@ const { verse, primaryCodes } = Astro.props;
     <button class="vp-tab" data-tab="song" role="tab" aria-selected="false" data-lazy="true">Song</button>
   </div>
 
-  <!-- Translations panel (default open) -->
+  <!-- Translations panel (default open). Skip rows whose translation
+       isn't ingested yet — readers shouldn't see five blank rows. -->
   <section class="vp-section is-active" data-pane="translations" role="tabpanel">
-    {primaryCodes.map((code) => (
+    {primaryCodes.filter((code) => verse.translations[code]).map((code) => (
       <p class="vp-translation" data-code={code}>
         <strong class="vp-code">{code.toUpperCase()}</strong>
-        <span class="vp-text">
-          {verse.translations[code] ?? <em class="vp-pending">[translation not yet generated]</em>}
-        </span>
+        <span class="vp-text">{verse.translations[code]}</span>
       </p>
     ))}
     {verse.translations.custom_v1 && (
       <p class="vp-translation vp-custom">
         <strong class="vp-code">CUSTOM</strong>
         <span class="vp-text">{verse.translations.custom_v1}</span>
+      </p>
+    )}
+    {primaryCodes.filter((code) => !verse.translations[code]).length > 0 && (
+      <p class="vp-translation-pending meta">
+        Not yet ingested for this chapter:&nbsp;
+        {primaryCodes.filter((code) => !verse.translations[code]).map((code) => code.toUpperCase()).join(" · ")}
       </p>
     )}
   </section>
