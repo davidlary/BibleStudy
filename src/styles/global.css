@@ -546,6 +546,46 @@ pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; ove
     border-top: 1px solid var(--rule);
     margin: 1rem 0;
 }
+
+/* Memory Anchor Card — a structured definition list that wraps
+   naturally at any width, replacing the wide fixed-width <pre>
+   block that Gemini emits as a code fence. */
+.vp-anchor-card {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.4rem 1.2rem;
+    margin: 0.6rem 0 0.8rem;
+    padding: 0.9rem 1.1rem;
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 5px 5px 0;
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+.vp-anchor-card dt {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+    align-self: start;
+    padding-top: 0.1rem;
+    white-space: nowrap;
+}
+.vp-anchor-card dd {
+    margin: 0;
+    color: var(--ink);
+    /* Wrap value text naturally; the grid 1fr column handles overflow. */
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+@media (max-width: 540px) {
+    .vp-anchor-card { grid-template-columns: 1fr; gap: 0.05rem 0; }
+    .vp-anchor-card dt { padding-top: 0.4rem; }
+    .vp-anchor-card dd { padding-bottom: 0.3rem; border-bottom: 1px dashed var(--rule); }
+    .vp-anchor-card dd:last-child { border-bottom: 0; }
+}
 .vp-md-rendered a {
     color: var(--link);
     text-decoration: underline;
