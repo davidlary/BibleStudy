@@ -11,6 +11,75 @@
 // small even when a chapter has hundreds of verses each carrying
 // rich data.
 const { verse, primaryCodes } = Astro.props;
+
+// Build the chronology-timeline projection in the frontmatter so we
+// don't run JS-with-comparison-operators inside JSX (Astro's parser
+// confuses `pct > 99` with tag-close).
+const _MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function _fmtYear(y) {
+  return y < 0 ? `${Math.abs(Math.round(y))} BC` : `${Math.round(y)} AD`;
+}
+function _fmtEventYear(e) {
+  if (e.bc_ad_year === null || e.bc_ad_year === undefined) return "—";
+  const era = e.bc_ad_year < 0 ? "BC" : "AD";
+  const yr = `${Math.abs(e.bc_ad_year)} ${era}`;
+  if (e.precision === "day" && e.month && e.day) {
+    return `${yr}, ${_MONTHS[e.month - 1]} ${e.day}`;
+  }
+  if (e.precision === "month" && e.month) {
+    return `${yr}, ${_MONTHS[e.month - 1]}`;
+  }
+  return yr;
+}
+function _buildTimeline(chronology, window) {
+  if (!chronology || chronology.length === 0 || !window) return null;
+  const span = window.max_year - window.min_year;
+  const placed = chronology.map((e) => {
+    const fy = (e.fractional_year !== null && e.fractional_year !== undefined)
+      ? e.fractional_year
+      : (e.bc_ad_year !== null && e.bc_ad_year !== undefined ? e.bc_ad_year : null);
+    let pct = null;
+    if (fy !== null && span > 0) {
+      const raw = ((fy - window.min_year) / span) * 100;
+      pct = Math.max(0, Math.min(100, raw));
+    }
+    return { ...e, _pct: pct, _yearLabel: _fmtEventYear(e) };
+  });
+  // Pick a stride giving roughly 6 ticks across the visible range.
+  const niceStrides = [1/365.25, 7/365.25, 30/365.25, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000];
+  const targetTicks = 6;
+  let stride = 1;
+  for (const s of niceStrides) {
+    if (span / s <= targetTicks) { stride = s; break; }
+  }
+  const ticks = [];
+  const startTick = Math.ceil(window.min_year / stride) * stride;
+  for (let t = startTick; t <= window.max_year; t += stride) {
+    const pct = ((t - window.min_year) / span) * 100;
+    const inGutter = (pct < 1) || (pct > 99);
+    if (inGutter) continue;
+    let label;
+    if (stride >= 1) {
+      label = _fmtYear(t);
+    } else {
+      const intYear = Math.floor(t);
+      const frac = t - intYear;
+      const monthIdx = Math.min(11, Math.max(0, Math.floor(frac * 12)));
+      label = `${_fmtYear(intYear)} ${_MONTHS[monthIdx]}`;
+    }
+    ticks.push({ pct, label });
+  }
+  let rangeLabel;
+  if (window.finest_precision === "day") {
+    rangeLabel = `± a few days · ${_fmtYear(window.min_year)} – ${_fmtYear(window.max_year)}`;
+  } else if (window.finest_precision === "month") {
+    rangeLabel = `± about a year · ${_fmtYear(window.min_year)} – ${_fmtYear(window.max_year)}`;
+  } else {
+    rangeLabel = `${_fmtYear(window.min_year)} – ${_fmtYear(window.max_year)}`;
+  }
+  return { placed, ticks, rangeLabel };
+}
+const timeline = _buildTimeline(verse.chronology, verse.chronology_window);
 ---
 <aside class="verse-panel" data-verse-id={verse.verse_id}>
   <div class="vp-tabs" role="tablist">
@@ -216,16 +285,28 @@ const { verse, primaryCodes } = Astro.props;
 
   <!-- Chronology panel (lazy) -->
   <section class="vp-section" data-pane="chronology" role="tabpanel" hidden>
-    {verse.chronology.length > 0 ? (
+    {timeline ? (
       <div class="vp-timeline" data-events={JSON.stringify(verse.chronology)}>
-        <ul>
-          {verse.chronology.map((e) => (
+        <p class="vp-timeline-range">{timeline.rangeLabel}</p>
+        <div class="vp-timeline-track" aria-hidden="false">
+          <div class="vp-timeline-axis"></div>
+          {timeline.ticks.map((tk) => (
+            <span class="vp-timeline-tick" style={`left:${tk.pct}%`}>
+              <span class="vp-timeline-tick-label">{tk.label}</span>
+            </span>
+          ))}
+          {timeline.placed.filter((e) => e._pct !== null).map((e) => (
+            <span
+              class={`vp-timeline-marker vp-era-${e.era} vp-cert-${e.certainty}`}
+              style={`left:${e._pct}%`}
+              title={`${e.event} (${e.certainty})`}
+            ></span>
+          ))}
+        </div>
+        <ul class="vp-event-list">
+          {timeline.placed.map((e) => (
             <li class={`vp-event vp-era-${e.era}`}>
-              <span class="vp-year">
-                {e.bc_ad_year !== null && e.bc_ad_year !== undefined
-                  ? `${Math.abs(e.bc_ad_year)} ${e.bc_ad_year < 0 ? "BC" : "AD"}`
-                  : "—"}
-              </span>
+              <span class="vp-year">{e._yearLabel}</span>
               <span class="vp-event-name">{e.event}</span>
               <span class="vp-certainty" title={e.era}>[{e.certainty}]</span>
             </li>
