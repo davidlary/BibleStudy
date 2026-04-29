@@ -42,7 +42,16 @@
     --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-    --col: 660px;
+    /* Reading column for verse text. 720px @ 19px serif/1.75 yields
+       ~62ch — squarely in Bringhurst's 60-75ch sweet spot for body
+       serif. The wider expanded panel breaks out below. */
+    --col: 720px;
+    /* Expanded verse-panel width. When a verse is opened on a wide
+       screen, the panel grows past the reading column so interlinear
+       tables and exegesis tabs aren't crammed into 720px. */
+    --col-wide: 1100px;
+    /* Page-level cap so we don't sprawl on 4K monitors. */
+    --col-page: 1400px;
     --topbar-h: 56px;
 
     --t-fast: 120ms ease;
@@ -77,12 +86,21 @@ html, body {
 
 body { min-height: 100vh; display: flex; flex-direction: column; }
 
+/* Page container occupies up to --col-page on giant monitors so the
+   expanded verse-panel can use horizontal space. Reading-flow children
+   (heading, provenance, chapter-body) re-narrow themselves to --col
+   below so verse text stays at the optimum 60-65ch. */
 main {
     width: 100%;
-    max-width: var(--col);
+    max-width: var(--col-page);
     margin: 0 auto;
     padding: 2rem 1.25rem 6rem;
     flex: 1 1 auto;
+}
+main > h1, main > .provenance, main > .chapter-body {
+    max-width: var(--col);
+    margin-left: auto;
+    margin-right: auto;
 }
 
 h1, h2, h3, h4 {
@@ -166,6 +184,12 @@ pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; ove
 .chapter-body {
     text-align: justify;
     hyphens: auto;
+    /* Don't clip the verse-panel breakout — it uses negative inline
+       margins to expand past the reading-column width. */
+    overflow: visible;
+}
+.pericope, .pericope-body {
+    overflow: visible;
 }
 /* Pericope: literary unit within a chapter — paragraph per pericope
    with a small all-caps heading. */
@@ -233,6 +257,25 @@ pre { background: var(--bg-elev); padding: 0.75rem 1rem; border-radius: 5px; ove
     font-family: var(--sans);
     font-size: 0.92rem;
     line-height: 1.55;
+}
+/* Break out of the reading column on wide screens so interlinear
+   tables and exegesis content can use the available horizontal
+   space rather than crowding into 720px. Negative inline margins
+   pull the panel's edges past the reading column boundaries; the
+   panel ends up centered around the column up to --col-wide. */
+@media (min-width: 1100px) {
+    .verse-panel {
+        margin-left: calc((var(--col) - var(--col-wide)) / 2);
+        margin-right: calc((var(--col) - var(--col-wide)) / 2);
+    }
+}
+/* On screens between the reading column and the breakout breakpoint,
+   the panel still gets a modest stretch so it doesn't feel cramped. */
+@media (min-width: 880px) and (max-width: 1099px) {
+    .verse-panel {
+        margin-left: calc((var(--col) - min(96vw, var(--col-wide))) / 2);
+        margin-right: calc((var(--col) - min(96vw, var(--col-wide))) / 2);
+    }
 }
 .verse[data-expanded="true"] + .verse-panel {
     display: block;
